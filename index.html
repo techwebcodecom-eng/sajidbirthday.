@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Birthday!</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+    * { margin:0; padding:0; box-sizing:border-box; font-family: 'Poppins', sans-serif; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #fceabb, #f8b500);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 25px;
+      padding: 50px 35px;
+      max-width: 650px;
+      text-align: center;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+      position: relative;
+      z-index: 2;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      color: #ff6b6b;
+      margin-bottom: 25px;
+    }
+
+    p {
+      font-size: 1.1em;
+      line-height: 1.7;
+      margin-bottom: 20px;
+      min-height: 1.5em;
+    }
+
+    .highlight { color: #1e90ff; font-weight: 600; }
+    .footer { font-style: italic; color: #666; margin-bottom: 25px; }
+
+    .tea-button {
+      background: #1e90ff;
+      color: #fff;
+      border: none;
+      padding: 12px 25px;
+      font-size: 1.1em;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .tea-button:hover { background: #0d6efd; transform: scale(1.05); }
+
+    .tea-cup {
+      width: 100px;
+      height: 100px;
+      border: 3px solid #333;
+      border-radius: 0 0 50% 50%;
+      margin: 30px auto 0;
+      position: relative;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .tea {
+      position: absolute;
+      bottom: -100%;
+      width: 100%;
+      height: 100%;
+      background: #ff6b6b;
+      transition: bottom 2s ease;
+      border-radius: 0 0 50% 50%;
+    }
+
+    .steam {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      width: 10px;
+      height: 30px;
+      background: linear-gradient(to top, rgba(255,255,255,0.6), rgba(255,255,255,0));
+      border-radius: 50%;
+      animation: rise 2s infinite;
+      opacity: 0;
+    }
+    .steam:nth-child(1){ animation-delay: 0s; left:45%; }
+    .steam:nth-child(2){ animation-delay: 0.5s; left:50%; }
+    .steam:nth-child(3){ animation-delay: 1s; left:55%; }
+
+    @keyframes rise {
+      0% { transform: translateY(0) scaleX(0.5); opacity:0; }
+      50% { opacity:0.7; }
+      100% { transform: translateY(-50px) scaleX(1); opacity:0; }
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background-color: #ff6b6b;
+      top: -10px;
+      animation: fall linear infinite;
+      opacity: 0.8;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    @keyframes fall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* Music control button */
+    .music-button {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(30,144,255,0.8);
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      z-index: 5;
+    }
+    .music-button:hover { background: rgba(30,144,255,1); }
+  </style>
+</head>
+<body>
+  <button class="music-button" onclick="toggleMusic()">🎵 Mute/Unmute</button>
+
+  <div class="card">
+    <h1>Happy Birthday! 🎉</h1>
+    <p id="line1"></p>
+    <p id="line2"></p>
+    <p id="line3"></p>
+    <p id="line4" class="footer"></p>
+
+    <button class="tea-button" onclick="celebrate()">☕ Send Your Wishes</button>
+    <div class="tea-cup" id="cup">
+      <div class="tea" id="tea"></div>
+      <div class="steam"></div>
+      <div class="steam"></div>
+      <div class="steam"></div>
+    </div>
+  </div>
+
+  <!-- Background Music -->
+  <audio id="bgMusic" loop autoplay>
+    <source src="https://www.bensound.com/bensound-music/bensound-sunny.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <script>
+    // Music toggle
+    const music = document.getElementById('bgMusic');
+    function toggleMusic() {
+      if(music.paused){ music.play(); } 
+      else { music.pause(); }
+    }
+
+    // Typewriter effect with highlights
+    const messages = [
+      "I really hope your day is filled with *smiles, good vibes,* and everything that makes you happy.",
+      "Honestly, I miss you — it’s been a while since we last met, and our chats always meant a lot to me. Some people may get busy, but they never feel distant in the heart.",
+      "Whenever you’re free, I’d genuinely love to sit together over a cup of tea and catch up like old times. *No pressure at all* — just whenever you feel comfortable.",
+      "Wishing you a beautiful year ahead, full of peace, success, and happiness. You truly deserve it."
+    ];
+    const ids = ["line1","line2","line3","line4"];
+    function typeLine(line, text, callback) {
+      let i = 0;
+      let insideHighlight = false;
+      function typeChar() {
+        if(i < text.length){
+          if(text[i] === "*"){
+            insideHighlight = !insideHighlight;
+            i++;
+            typeChar();
+            return;
+          }
+          if(insideHighlight){
+            line.innerHTML += `<span class="highlight">${text[i]}</span>`;
+          } else {
+            line.innerHTML += text[i];
+          }
+          i++;
+          setTimeout(typeChar, 40);
+        } else {
+          if(callback) callback();
+        }
+      }
+      typeChar();
+    }
+    function startTyping(index=0){
+      if(index < messages.length){
+        typeLine(document.getElementById(ids[index]), messages[index], () => startTyping(index+1));
+      }
+    }
+    startTyping();
+
+    // Initial falling confetti
+    const baseColors = ['#ff6b6b', '#1e90ff', '#ffd93d', '#6bcf00', '#ff3dff'];
+    for(let i=0;i<50;i++){
+      const confetti = document.createElement('div');
+      confetti.classList.add('confetti');
+      confetti.style.left = Math.random()*100+'vw';
+      confetti.style.width = confetti.style.height = (5+Math.random()*10)+'px';
+      confetti.style.backgroundColor = baseColors[Math.floor(Math.random()*baseColors.length)];
+      confetti.style.animationDuration = (3+Math.random()*5)+'s';
+      confetti.style.animationDelay = Math.random()*5+'s';
+      document.body.appendChild(confetti);
+    }
+
+    // Tea celebration function with burst confetti
+    function celebrate(){
+      const tea = document.getElementById('tea');
+      tea.style.bottom = '0';
+      const steam = document.querySelectorAll('.steam');
+      steam.forEach(s => s.style.opacity='1');
+      alert("Your tea invitation is sent! ☕");
+
+      // Burst confetti
+      for(let i=0;i<50;i++){
+        const c = document.createElement('div');
+        c.classList.add('confetti');
+        c.style.left = (50+Math.random()*60-30)+'px';
+        c.style.top = '50px';
+        c.style.width = c.style.height = (5+Math.random()*10)+'px';
+        c.style.backgroundColor = baseColors[Math.floor(Math.random()*baseColors.length)];
+        c.style.animationDuration = (1+Math.random()*2)+'s';
+        document.body.appendChild(c);
+        setTimeout(()=>c.remove(),2000);
+      }
+    }
+  </script>
+</body>
+</html>
